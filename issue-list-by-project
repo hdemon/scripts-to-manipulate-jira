@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ -z ${JIRA_ORIGIN+x} ]; then
+  JIRA_ORIGIN="https://jira.atlassian.com"
+  echo $JIRA_ORIGIN
+fi
+
+curl -u $JIRA_USER:$JIRA_PASS $JIRA_ORIGIN '/rest/api/2/search?jql=project=FORTUNE' -s | jq '.issues | map({key: .key, assignee: .fields.assignee.displayName, reporter: .fields.reporter.displayName, creator: .fields.creator.displayName, summary: .fields.summary, prority: .fields.priority.name, issuetype: .fields.issuetype.name, subtasks: [.fields.subtasks[] | .key], components: [.fields.components[] | .name] })'

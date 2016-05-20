@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+require "json"
+
+def parent? issue
+  issue['issuetype'] != "Sub-task"
+end
+
+def has_subtask? issue
+  # p issue['subtasks']
+  issue['subtasks'].length != 0
+end
+
+def parent_row issue
+  key = "\033[36m" + issue['key'] + "\033[0m"
+  assignee = "\033[30m" + issue['assignee'].gsub(/\[.*\]/, "") + "\033[0m"
+  summary = issue['summary']
+  puts "#{key} #{assignee} #{summary}"
+end
+
+def subtask_row _key
+  issue = select_subtask_issue _key
+  key = "\033[36m" + issue['key'] + "\033[0m"
+  assignee = "\033[30m" + issue['assignee'].gsub(/\[.*\]/, "") + "\033[0m"
+  summary = issue['summary']
+  puts "└──  #{key} #{assignee} #{summary}"
+end
+
+def select_subtask_issue key
+  result = `./get-issue-by-key #{key}`
+  JSON.parse(result)
+end
+
+input = ""
+
+while str = STDIN.gets
+  break if str.chomp == "exit"
+  input += str
+end
+
+$issues = JSON.parse input
+
+$issues.select { |issue| parent? issue }.each do |issue|
+  parent_row issue
+  if has_subtask? issue
+    issue['subtasks'].each { |key| subtask_row key } if has_subtask? issue
+  end
+end
