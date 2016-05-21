@@ -9,5 +9,5 @@ brew install jq
 ## Usage
 
 ```
-./issue-list-by-project foo | ./filter-components var | ./show-summary
+./issue-list-by-project foo | ./filter-components bar | ./show-summary
 ```
